@@ -89,7 +89,7 @@ smile = st.text_input('Enter canonical smile')
 smiles = smile.split()
 dsf = pd.DataFrame(smiles, columns=['Canonical smile'])
 dsf['Name'] ='Compound'
-st.write(dsf)
+#st.write(dsf)
 receptor_mode = st.selectbox('Choose a Target Receptor Activity',['Acetylcholinesterase IC50', 'Acetylcholinesterase Binding Affinity (Ki)'])
 if st.button('Predict'):
     load_data = dsf
