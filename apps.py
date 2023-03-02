@@ -115,4 +115,4 @@ if st.button('Predict'):
 
     
 else:
-    st.info('Upload input data to start!')
+    st.info('Input canonical smile to start!')
