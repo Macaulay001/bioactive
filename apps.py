@@ -116,7 +116,7 @@ def acetylcholinesterase_multiple_build_Ki_model(input_data):
 selected = option_menu(
             menu_title=None,  # required
             options=["Home", "Multiple Prediction", "Contact", 'Credits'],  # required
-            icons=["house", "book", "envelope","hand-thumbs-up"],  # optional
+            icons=["house", "filetype-csv", "envelope","hand-thumbs-up"],  # optional
             menu_icon="cast",  # optional
             default_index=0,  # optional
             orientation="horizontal",
