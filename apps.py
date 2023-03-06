@@ -202,9 +202,9 @@ if selected =='Home':
 
     # Page title
     st.markdown("""
-    # Compounds Bioactivity Prediction App for Drug Target in Metabolic Syndromes
+    # Bioactivity Prediction for Nutraceuticals and Bioactive Compounds
 
-    This app allows you to predict the bioactivity of compounds towards acetylcholinesterase enzymes.
+    This app allows you to predict the bioactivity of bioactive compounds using Machine Learning.
 
     **Credits**
     - Built using `Python` and `Streamlit` by Nutritional and industrial Laboratory, Department of Biochemistry, University of Ibadan
