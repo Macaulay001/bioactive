@@ -33,7 +33,7 @@ def filedownload(df):
 ############################################################################################################################################################################################
 def acetylcholinesterase_single_build_IC50_model(input_data):
     # Reads in saved regression model
-    load_model = pickle.load(open('acetylcholinesterase_model.pkl', 'rb'))
+    load_model = pickle.load(open('acetylcholinesterase_IC50_model.pkl', 'rb'))
     # Apply model to make predictions
     prediction = load_model.predict(input_data)
     st.header('**Prediction output**')
@@ -69,10 +69,12 @@ def acetylcholinesterase_single_build_Ki_model(input_data):
     st.write(df)
     st.markdown(filedownload(df), unsafe_allow_html=True)
 
+
+
 #######################################################################################################################################################################
 def acetylcholinesterase_multiple_build_IC50_model(input_data):
     # Reads in saved regression model
-    load_model = pickle.load(open('acetylcholinesterase_model.pkl', 'rb'))
+    load_model = pickle.load(open('acetylcholinesterase_IC50_model.pkl', 'rb'))
     # Apply model to make predictions
     prediction = load_model.predict(input_data)
     st.header('**Prediction output**')
@@ -109,6 +111,85 @@ def acetylcholinesterase_multiple_build_Ki_model(input_data):
     st.write(df)
     st.markdown(filedownload(df), unsafe_allow_html=True)
 
+
+############################################################################################################################################################################################
+def PTP1B_single_build_IC50_model(input_data):
+    # Reads in saved regression model
+    load_model = pickle.load(open('PTP1B_IC50_model.pkl', 'rb'))
+    # Apply model to make predictions
+    prediction = load_model.predict(input_data)
+    st.header('**Prediction output**')
+    prediction_output = pd.Series(prediction, name='pIC50')
+    canonical_smile =  load_data.iloc[:,[0]]
+    df = pd.concat([canonical_smile, prediction_output], axis=1)
+    df['IC50'] = (10**(9-(df['pIC50'])))
+    bioactivity_class = []
+    for i in df.IC50:
+        if float(i) >= 10000:
+            bioactivity_class.append("inactive")
+        elif float(i) <= 1000:
+            bioactivity_class.append("active")
+        else:
+            bioactivity_class.append("intermediate")
+    bioactivity_class = pd.Series(bioactivity_class, name='Bioactivity_class')
+    df = pd.concat([df, bioactivity_class], axis=1)
+
+    st.write(df)
+    st.markdown(filedownload(df), unsafe_allow_html=True)
+
+def PTP1B_single_build_Ki_model(input_data):
+    # Reads in saved regression model
+    load_model = pickle.load(open('PTP1B_Ki_model.pkl', 'rb'))
+    # Apply model to make predictions
+    prediction = load_model.predict(input_data)
+    st.header('**Prediction output**')
+    prediction_output = pd.Series(prediction, name='pKi')
+    canonical_smile =  load_data.iloc[:,[0]]
+    df = pd.concat([canonical_smile, prediction_output], axis=1)
+    df['Binding Affinity'] = round(float(10**(9-(df['pKi']))),2)
+    st.write(df)
+    st.markdown(filedownload(df), unsafe_allow_html=True)
+
+#######################################################################################################################################################################
+def PTP1B_multiple_build_IC50_model(input_data):
+    # Reads in saved regression model
+    load_model = pickle.load(open('PTP1B_IC50_model.pkl', 'rb'))
+    # Apply model to make predictions
+    prediction = load_model.predict(input_data)
+    st.header('**Prediction output**')
+    prediction_output = pd.Series(prediction, name='pIC50')
+    molecule_name = dfss.iloc[:,[0]]
+    canonical_smile = dfss.iloc[:,[1]]
+    df = pd.concat([molecule_name,canonical_smile, prediction_output], axis=1)
+    df['IC50'] = (10**(9-(df['pIC50'])))
+    bioactivity_class = []
+    for i in df.IC50:
+        if float(i) >= 10000:
+            bioactivity_class.append("inactive")
+        elif float(i) <= 1000:
+            bioactivity_class.append("active")
+        else:
+            bioactivity_class.append("intermediate")
+    bioactivity_class = pd.Series(bioactivity_class, name='Bioactivity_class')
+    df = pd.concat([df, bioactivity_class], axis=1)
+
+    st.write(df)
+    st.markdown(filedownload(df), unsafe_allow_html=True)
+
+def PTP1B_multiple_build_Ki_model(input_data):
+    # Reads in saved regression model
+    load_model = pickle.load(open('PTP1B_Ki_model.pkl', 'rb'))
+    # Apply model to make predictions
+    prediction = load_model.predict(input_data)
+    st.header('**Prediction output**')
+    prediction_output = pd.Series(prediction, name='pKi')
+    molecule_name = dfss.iloc[:,[0]]
+    canonical_smile = dfss.iloc[:,[1]]
+    df = pd.concat([molecule_name,canonical_smile, prediction_output], axis=1)
+    df['Ki'] = (10**(9-(df['pKi'])))
+    st.write(df)
+    st.markdown(filedownload(df), unsafe_allow_html=True)
+
 #######################################################################################################################################################################
 
 # import streamlit as st
@@ -130,7 +211,7 @@ if selected =='Multiple Prediction':
     [Example input file](https://raw.githubusercontent.com/Macaulay001/Machine_Learning/main/example_file.csv)
     """)
 
-    receptor_mode = st.selectbox('Choose a Target Receptor Activity',['Acetylcholinesterase IC50', 'Acetylcholinesterase Binding Affinity (Ki)'])
+    receptor_mode = st.selectbox('Choose a Target Receptor Activity',['Acetylcholinesterase IC50', 'Acetylcholinesterase Binding Affinity (Ki)','PTP1B IC50', 'PTP1B Binding Affinity (Ki)'])
 
     if st.button('Predict'):
         dfs = pd.read_csv(uploaded_file,  sep=',')
@@ -161,7 +242,7 @@ if selected =='Multiple Prediction':
         # Read descriptor list used in previously built model
         if receptor_mode=='Acetylcholinesterase IC50':
             # st.header('**Subset of descriptors from previously built Acetylcholinesterase models**')
-            Xlist = list(pd.read_csv('descriptor_list.csv').columns)
+            Xlist = list(pd.read_csv('acetylcholinesterase_IC50_descriptor_list.csv').columns)
             desc_subset = desc[Xlist]
             # st.write(desc_subset)
             # st.write(desc_subset.shape)
@@ -175,6 +256,22 @@ if selected =='Multiple Prediction':
             # st.write(desc_subset.shape)
             # Apply trained model to make prediction on query compounds
             acetylcholinesterase_multiple_build_Ki_model(desc_subset)
+        elif receptor_mode=='PTP1B IC50':
+            # st.header('**Subset of descriptors from previously built PTP1B models**')
+            Xlist = list(pd.read_csv('PTP1B_IC50_descriptor_list.csv').columns)
+            desc_subset = desc[Xlist]
+            # st.write(desc_subset)
+            # st.write(desc_subset.shape)
+            # Apply trained model to make prediction on query compounds
+            PTP1B_multiple_build_IC50_model(desc_subset)
+        elif receptor_mode=='PTP1B Binding Affinity (Ki)':
+            # st.header('**Subset of descriptors from previously built PTP1B models**')
+            Xlist = list(pd.read_csv('PTP1B_Ki_descriptor_list.csv').columns)
+            desc_subset = desc[Xlist]
+            # st.write(desc_subset)
+            # st.write(desc_subset.shape)
+            # Apply trained model to make prediction on query compounds
+            PTP1B_multiple_build_Ki_model(desc_subset)
         else:
             st.info('Reload Page and choose a target Receptor!')
 
@@ -214,7 +311,7 @@ if selected =='Home':
     dsf = pd.DataFrame(smiles, columns=['Canonical smile'])
     dsf['Name'] ='Compound'
     # st.write(dsf)
-    receptor_mode = st.selectbox('Choose a Target Receptor Activity',['Acetylcholinesterase IC50', 'Acetylcholinesterase Binding Affinity (Ki)'])
+    receptor_mode = st.selectbox('Choose a Target Receptor Activity',['Acetylcholinesterase IC50', 'Acetylcholinesterase Binding Affinity (Ki)','PTP1B IC50', 'PTP1B Binding Affinity (Ki)'])
     if st.button('Predict'):
         load_data = dsf
         load_data.to_csv('molecule.smi', sep = '\t', header = False, index = False)
@@ -226,14 +323,24 @@ if selected =='Home':
         # Read descriptor list used in previously built model
         if receptor_mode=='Acetylcholinesterase IC50':
             # st.header('**Subset of descriptors from previously built Acetylcholinesterase models**')
-            Xlist = list(pd.read_csv('descriptor_list.csv').columns)
+            Xlist = list(pd.read_csv('acetylcholinesterase_IC50_descriptor_list.csv').columns)
             desc_subset = desc[Xlist]
             acetylcholinesterase_single_build_IC50_model(desc_subset)
         elif receptor_mode=='Acetylcholinesterase Binding Affinity (Ki)':
             Xlist = list(pd.read_csv('acetylcholinesterase_Ki_descriptor_list.csv').columns)
             desc_subset = desc[Xlist]
             acetylcholinesterase_single_build_Ki_model(desc_subset)
-        
+        elif receptor_mode=='PTP1B Binding Affinity (Ki)':
+            # st.header('**Subset of descriptors from previously built PTP1B models**')
+            Xlist = list(pd.read_csv('PTP1B_IC50_descriptor_list.csv').columns)
+            desc_subset = desc[Xlist]
+            PTP1B_single_build_IC50_model(desc_subset)
+        elif receptor_mode=='PTP1B Binding Affinity (Ki)':
+            Xlist = list(pd.read_csv('PTP1B_Ki_descriptor_list.csv').columns)
+            desc_subset = desc[Xlist]
+            PTP1B_single_build_Ki_model(desc_subset)
+
+
         else:
             st.info('Reload Page and choose a target Receptor!')
 
