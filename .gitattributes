@@ -1,1 +1,2 @@
 acetylcholinesterase_model.pkl filter=lfs diff=lfs merge=lfs -text
+PTP1B_IC50_descriptor_list.csv filter=lfs diff=lfs merge=lfs -text
